@@ -51,6 +51,17 @@
   window.addEventListener('scroll', onScroll, { passive: true });
   onScroll();
 
+  /* ---------- Back to top ---------- */
+  var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  document.querySelectorAll('a[href="#top"]').forEach(function (link) {
+    link.addEventListener('click', function (e) {
+      e.preventDefault();
+      window.scrollTo({ top: 0, left: 0, behavior: reduceMotion ? 'auto' : 'smooth' });
+      if (history.replaceState) history.replaceState(null, '', window.location.pathname + window.location.search);
+    });
+  });
+
   /* ---------- Scroll reveal ---------- */
   var reveals = document.querySelectorAll('.reveal');
 
@@ -87,39 +98,6 @@
     }, { rootMargin: '-45% 0px -50% 0px', threshold: 0 });
 
     sections.forEach(function (section) { navObserver.observe(section); });
-  }
-
-  /* ---------- Animated counters ---------- */
-  var counters = document.querySelectorAll('[data-count]');
-
-  function animateCounter(el) {
-    var target = parseInt(el.getAttribute('data-count'), 10) || 0;
-    var duration = 1200;
-    var start = null;
-
-    function step(ts) {
-      if (start === null) start = ts;
-      var progress = Math.min((ts - start) / duration, 1);
-      var eased = 1 - Math.pow(1 - progress, 3);
-      el.textContent = Math.round(eased * target);
-      if (progress < 1) requestAnimationFrame(step);
-    }
-    requestAnimationFrame(step);
-  }
-
-  if ('IntersectionObserver' in window) {
-    var counterObserver = new IntersectionObserver(function (entries, obs) {
-      entries.forEach(function (entry) {
-        if (entry.isIntersecting) {
-          animateCounter(entry.target);
-          obs.unobserve(entry.target);
-        }
-      });
-    }, { threshold: 0.5 });
-
-    counters.forEach(function (el) { counterObserver.observe(el); });
-  } else {
-    counters.forEach(function (el) { el.textContent = el.getAttribute('data-count'); });
   }
 
   /* ---------- Footer year ---------- */
